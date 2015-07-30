@@ -21,7 +21,7 @@ object Main {
       val userId = report.getString("USER_ID")
       val dateAt = report.getInt("DATE_AT")
       val content = report.getMap[DMap]("CONTENT")
-      content("fishes").asInstanceOf[ArrayList[DMap]].toList.zipWithIndex.map {
+      content("fishes").asInstanceOf[ArrayList[DMap]].zipWithIndex.map {
         case (fish, index) =>
           new Item()
             .withString("REPORT_ID", reportId)
