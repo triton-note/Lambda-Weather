@@ -52,10 +52,11 @@ object Main {
 
     new DynamoEvent(event.toMap).records.foreach { record =>
       logger.info(f"Record: ${record.dynamodb}")
-      record.eventName match {
-        case "INSERT" => insert(record.dynamodb.newItem.get)
-        case "MODIFY" => modify(record.dynamodb.oldItem.get, record.dynamodb.newItem.get)
-        case "REMOVE" => remove(record.dynamodb.oldItem.get)
+      (record.dynamodb.oldItem, record.dynamodb.newItem) match {
+        case (None, Some(newReport))            => insert(newReport)
+        case (Some(oldReport), Some(newReport)) => modify(oldReport, newReport)
+        case (Some(oldReport), None)            => remove(oldReport)
+        case (None, None)                       => throw new RuntimeException("No items passed")
       }
     }
   }
