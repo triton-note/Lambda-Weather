@@ -27,11 +27,12 @@ package object dynamodb {
 
   val jsonFactory = new JsonFactory
 
-  private object DynamoDB {
+  object DynamoDB {
     lazy val client = new com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient()
     lazy val delegate = new com.amazonaws.services.dynamodbv2.document.DynamoDB(client)
   }
-  def getTable(name: String) = DynamoDB.delegate.getTable(name)
+  val TABLE_NAME = "TritonNote-TEST.CATCHES"
+  lazy val table = DynamoDB.delegate.getTable(TABLE_NAME)
 }
 
 package dynamodb {

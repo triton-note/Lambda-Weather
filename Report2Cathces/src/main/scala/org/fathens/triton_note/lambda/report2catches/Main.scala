@@ -1,11 +1,13 @@
 package org.fathens.triton_note.lambda.report2catches
 
+import java.util.ArrayList
+
 import scala.collection.JavaConversions._
 
 import org.fathens.triton_note.lambda.Logger
-import org.fathens.triton_note.lambda.dynamodb.{ DMap, DynamoEvent, getTable }
+import org.fathens.triton_note.lambda.dynamodb.{ DMap, DynamoDB, DynamoEvent, TABLE_NAME, table }
 
-import com.amazonaws.services.dynamodbv2.document.{ Item, PrimaryKey }
+import com.amazonaws.services.dynamodbv2.document.{ Item, PrimaryKey, TableWriteItems }
 import com.amazonaws.services.lambda.runtime.Context
 
 object Main {
@@ -13,15 +15,13 @@ object Main {
     val logger = new Logger(context.getLogger);
     logger.info(f"Passed records: ${event}");
 
-    lazy val table = getTable("TritonNote-TEST.CATCHES")
-
     def toFishes(report: Item) = {
       logger.debug(f"Parsing report to fishes: ${report}")
       val reportId = report.getString("ID")
       val userId = report.getString("USER_ID")
       val dateAt = report.getInt("DATE_AT")
       val content = report.getMap[DMap]("CONTENT")
-      content("fishes").asInstanceOf[java.util.ArrayList[DMap]].toList.zipWithIndex.map {
+      content("fishes").asInstanceOf[ArrayList[DMap]].toList.zipWithIndex.map {
         case (fish, index) =>
           new Item()
             .withString("REPORT_ID", reportId)
@@ -38,11 +38,12 @@ object Main {
       toFishes(report).foreach(table.putItem)
     }
     def remove(report: Item) {
-      val reportId = report.getString("REPORT_ID")
-      val fishIndex = report.getInt("FISH_INDEX")
-      table.deleteItem(new PrimaryKey(
-        "REPORT_ID", report.getString("REPORT_ID"),
-        "FISH_INDEX", report.getInt("FISH_INDEX")))
+      val reportId = report.getString("ID")
+      val keys = report.getMap[ArrayList[DMap]]("CONTENT")("fishes").zipWithIndex.map {
+        case (_, index) =>
+          new PrimaryKey("REPORT_ID", reportId, "FISH_INDEX", index)
+      }
+      DynamoDB.delegate.batchWriteItem(new TableWriteItems(TABLE_NAME).withPrimaryKeysToDelete(keys: _*))
     }
     def modify(oldReport: Item, newReport: Item) {
       remove(oldReport)
