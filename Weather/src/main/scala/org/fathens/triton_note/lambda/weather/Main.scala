@@ -4,7 +4,8 @@ import java.util.{ Date, LinkedHashMap }
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 import org.fathens.triton_note.lambda.Logger
 
@@ -19,17 +20,16 @@ object Main {
     val weather = new OpenWeatherMap(logger, event("apiKey"));
     val date = new Date(event("date").toLong);
     val geoinfo = GeoInfo(event("lat").toDouble, event("lng").toDouble)
-    weather(date, geoinfo).map {
-      _ match {
-        case None =>
-        case Some(w) =>
-          val map = Map(
-            "nominal" -> w.nominal,
-            "temperature" -> w.temperature,
-            "iconId" -> w.iconId
-          )
-          new ObjectMapper().writeValueAsString(map.asJava)
-      }
+    val result = Await.result(weather(date, geoinfo), 12 seconds)
+    result match {
+      case None => "{}"
+      case Some(w) =>
+        val map = Map(
+          "nominal" -> w.nominal,
+          "temperature" -> w.temperature,
+          "iconId" -> w.iconId
+        )
+        new ObjectMapper().writeValueAsString(map.asJava)
     }
   }
 }
