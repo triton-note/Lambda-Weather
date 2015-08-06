@@ -10,7 +10,6 @@ import scala.concurrent.duration.DurationInt
 import org.fathens.triton_note.lambda.Logger
 
 import com.amazonaws.services.lambda.runtime.Context
-import com.fasterxml.jackson.databind.ObjectMapper
 
 object Main {
   def handler(event: LinkedHashMap[String, String], context: Context) = {
@@ -21,15 +20,14 @@ object Main {
     val date = new Date(event("date").toLong);
     val geoinfo = GeoInfo(event("lat").toDouble, event("lng").toDouble)
     val result = Await.result(weather(date, geoinfo), 12 seconds)
-    result match {
-      case None => "{}"
-      case Some(w) =>
-        val map = Map(
-          "nominal" -> w.nominal,
-          "temperature" -> w.temperature,
-          "iconId" -> w.iconId
-        )
-        new ObjectMapper().writeValueAsString(map.asJava)
+    val map = result match {
+      case None => Map()
+      case Some(w) => Map(
+        "nominal" -> w.nominal,
+        "temperature" -> w.temperature,
+        "iconId" -> w.iconId
+      )
     }
+    map.asJava
   }
 }
