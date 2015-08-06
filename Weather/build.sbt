@@ -1,6 +1,6 @@
 name := "TritonNote-Lambda-Weather"
 
-version := "0.1.0"
+version := "1.0.2"
 
 scalaVersion := "2.11.7"
 
