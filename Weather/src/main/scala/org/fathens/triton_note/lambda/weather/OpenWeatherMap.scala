@@ -26,7 +26,11 @@ class OpenWeatherMap(logger: Logger, apiKey: String) {
     def getMap(key: String) = map(key).asInstanceOf[JMap].toMap
     def getString(key: String) = map(key).asInstanceOf[java.lang.String]
     def getInt(key: String): Int = map(key).asInstanceOf[java.lang.Integer]
-    def getDouble(key: String): Double = map(key).asInstanceOf[java.lang.Double]
+    def getDouble(key: String): Double = map(key) match {
+      case v: java.lang.Double => v
+      case v: java.lang.Integer => v.toDouble
+      case v => throw new ClassCastException(f"${v}(${v.getClass} cannot cast to java.lang.Double.")
+    }
   }
 
   /**
