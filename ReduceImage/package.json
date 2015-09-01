@@ -4,7 +4,9 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
-    "async": "^1.4.2"
+    "async": "^1.4.2",
+    "gm": "^1.18.1",
+    "js-yaml": "^3.4.0"
   },
   "devDependencies": {},
   "scripts": {
