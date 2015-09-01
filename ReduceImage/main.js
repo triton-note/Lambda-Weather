@@ -28,18 +28,12 @@ var resize = function(data, maxSize, next) {
 	});
 }
 
-var proc = function(record, next) {
-    log(record);
-    var bucket = record.s3.bucket.name;
-    var srcKey = decodeURIComponent(record.s3.object.key.replace(/\+/g, " "));
-    var found = srcKey.match(/^(.+)\/original\/(.+)$/);
-    var prefix = found[1];
-    var filename = found[2];
-    log("Prefex: ", prefix, ", Filename: ", filename);
+var proc = function(src, next) {
+    log(src);
     async.waterfall(
     		[
     		 function(next) {
-    			 var params = {Bucket: bucket, Key: srcKey};
+    			 var params = {Bucket: src.bucket, Key: src.key};
     			 log("Downloading...", params);
     			 s3.getObject(params, next);
     		 },
@@ -49,7 +43,7 @@ var proc = function(record, next) {
     					 [
     					  function(next) {
     						  s3.getObject({
-    							  Bucket: bucket, 
+    							  Bucket: src.bucket, 
     							  Key: "unauthorized/settings.yaml"
     						  }, next);
     					  },
@@ -71,9 +65,9 @@ var proc = function(record, next) {
     		 },
     		 function(list, next) {
     			 async.map(list, function(obj, next) {
-    				 var dstKey = prefix + "/reduced/" + obj.name + "/" + filename;
+    				 var dstKey = src.prefix + "/reduced/" + obj.name + "/" + src.filename;
     				 s3.putObject({
-    					 Bucket: bucket,
+    					 Bucket: src.bucket,
     					 Key: dstKey,
     					 Body: obj.data,
     					 ContentType: obj.contentType
@@ -88,7 +82,23 @@ var proc = function(record, next) {
 
 exports.handler = function(event, context) {
 	console.log('Received event:', JSON.stringify(event, null, 2));
-    async.map(event.Records, proc, function(err, results) {
+	var records = event.Records.map(function(record) {
+	    var srcKey = decodeURIComponent(record.s3.object.key.replace(/\+/g, " "));
+	    var found = srcKey.match(/^(.+)\/original\/(.+)$/);
+	    if (found) {
+	    	return {
+	    		bucket: record.s3.bucket.name,
+	    		key: srcKey,
+	    		prefix: found[1],
+	    		filename: found[2]
+	    	};
+	    } else {
+	    	return null;
+	    }
+	}).filter(function(record) {
+		return record;
+	});
+    async.map(records, proc, function(err, results) {
     	if (err) {
     		context.fail(err);
     	} else {
