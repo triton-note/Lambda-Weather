@@ -65,7 +65,7 @@ var proc = function(src, next) {
     		 },
     		 function(list, next) {
     			 async.map(list, function(obj, next) {
-    				 var dstKey = src.prefix + "/reduced/" + obj.name + "/" + src.filename;
+    				 var dstKey = src.prefix + "/reduced/" + obj.name + "/" + src.surfix;
     				 s3.putObject({
     					 Bucket: src.bucket,
     					 Key: dstKey,
@@ -90,7 +90,7 @@ exports.handler = function(event, context) {
 	    		bucket: record.s3.bucket.name,
 	    		key: srcKey,
 	    		prefix: found[1],
-	    		filename: found[2]
+	    		surfix: found[2]
 	    	};
 	    } else {
 	    	return null;
@@ -100,8 +100,10 @@ exports.handler = function(event, context) {
 	});
     async.map(records, proc, function(err, results) {
     	if (err) {
+    		log(err);
     		context.fail(err);
     	} else {
+    		log("Results: ", results);
     		context.succeed("Results: " + results);
     	}
     });
