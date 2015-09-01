@@ -27,7 +27,7 @@
                "arn":"arn:aws:s3:::triton-note-test"
             },
             "object":{
-               "key":"user/us-east-1:9bf513df-d3b2-4e1f-a9b9-d1d6706a1178/photo/9yvdy8x2ut7jd4b6jhjasha17km5f0dp/original/photo_file.jpg",
+               "key":"photo/original/us-east-1:9bf513df-d3b2-4e1f-a9b9-d1d6706a1178/9yvdy8x2ut7jd4b6jhjasha17km5f0dp/photo_file.jpg",
                "size":310234,
                "eTag":"d41d8cd98f00b204e9800998ecf8427e",
                "versionId":"096fKKXTRTtl3on89fVO.nfljtsv6qko"
@@ -61,7 +61,7 @@
                "arn":"arn:aws:s3:::triton-note-test"
             },
             "object":{
-               "key":"user/us-east-1:9bf513df-d3b2-4e1f-a9b9-d1d6706a1178/photo/9yvdy8x2ut7jd4b6jhjasha17km5f0dp/reduced/mainview/photo_file.jpg",
+               "key":"photo/reduced/mainview/us-east-1:9bf513df-d3b2-4e1f-a9b9-d1d6706a1178/9yvdy8x2ut7jd4b6jhjasha17km5f0dp/photo_file.jpg",
                "size":310234,
                "eTag":"d41d8cd98f00b204e9800998ecf8427e",
                "versionId":"096fKKXTRTtl3on89fVO.nfljtsv6qko"
