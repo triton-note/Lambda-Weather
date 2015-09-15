@@ -46,8 +46,8 @@ var build_response = function(settings, info, next) {
 	} else {
 		var result = {
 				name: info.weather[0].main,
-				iconUrl: settings.iconUrl + "/" + info.weather[0].icon,
-				temperature: info.main.temp
+				iconUrl: settings.iconUrl + "/" + info.weather[0].icon + ".png",
+				temperature: Math.round(info.main.temp * 100 - 27315) / 100
 		};
 		next(null, result);
 	}
@@ -113,7 +113,6 @@ exports.handler = function(event, context) {
     		 function(settings, next) {
 				 var params = {
 						 APPID: settings.apiKey,
-						 units: "metric",
 						 lat: latitude,
 						 lon: longitude
 				 };
