@@ -97,7 +97,7 @@ exports.handler = function(event, context) {
     		 function(next) {
     			 s3.getObject({
 					 Bucket: bucketName, 
-					 Key: "unauthorized/settings.yaml"
+					 Key: "unauthorized/lambda.yaml"
 				 }, next);
     		 },
 			 function(res, next) {
