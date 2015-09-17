@@ -1,5 +1,4 @@
 var async = require('async');
-var yaml = require('yaml-js');
 var request = require('superagent');
 var aws = require('aws-sdk');
 var s3 = new aws.S3();
@@ -97,13 +96,13 @@ exports.handler = function(event, context) {
     		 function(next) {
     			 s3.getObject({
 					 Bucket: bucketName, 
-					 Key: "unauthorized/lambda.yaml"
+					 Key: "lambda/settings.json"
 				 }, next);
     		 },
 			 function(res, next) {
     			 try {
 					 var text = res.Body.toString();
-					 var settings = yaml.load(text);
+					 var settings = JSON.parse(text);
 					 log("Settings: ", settings);
 					 next(null, settings.openweathermap);
     			 } catch (ex) {
@@ -126,7 +125,7 @@ exports.handler = function(event, context) {
     		 ],
     		 function(err, result) {
     			if (err) {
-    				context.faile(err);
+    				context.fail(err);
     			} else {
     				log("Result:", result);
     				context.succeed(result);
