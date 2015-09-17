@@ -125,7 +125,7 @@ exports.handler = function(event, context) {
     		 ],
     		 function(err, result) {
     			if (err) {
-    				context.faile(err);
+    				context.fail(err);
     			} else {
     				log("Result:", result);
     				context.succeed(result);
